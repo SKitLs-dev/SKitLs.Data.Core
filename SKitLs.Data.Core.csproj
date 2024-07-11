@@ -4,12 +4,61 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>$(AssemblyName)</Title>
+    <Authors>SKitLs, Sargeras02</Authors>
+    <Description>SKitLs.Data.Core is a powerful C# library designed to streamline data management.
+It offers a unified interface for handling data, ensuring automatic data persistence and real-time updates through event notifications.</Description>
+    <Copyright>Copyright (C) 2024, SKitLs</Copyright>
+    <PackageProjectUrl>https://github.com/SKitLs-dev/SKitLs.Data.Core</PackageProjectUrl>
+    <PackageIcon>sk.dt.core.png</PackageIcon>
+    <PackageTags>data-management</PackageTags>
+    <PackageReleaseNotes>Initial pre-Release
+(+) Basic Data Manager
+(+) Basic DataBanks
+(+) Basic IdGenerator
+
+(+) WIP: Explorable Collection and Filters
+
+(~) Updated: README
+(~) Updated: LICENSE</PackageReleaseNotes>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <Version>$(AssemblyVersion)-preview.0</Version>
+    <IncludeSymbols>False</IncludeSymbols>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="7.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
+    <None Include="..\sk.dt.core.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SKitLs.Data.IO" Version="1.0.1" />
     <PackageReference Include="SKitLs.Utils.Extensions" Version="0.0.5-alpha.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SKitLs.Utils.Exceptions">
+      <HintPath>..\..\SKitLs.Utils\SKitLs.Utils.Exceptions\bin\Debug\net8.0\SKitLs.Utils.Exceptions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

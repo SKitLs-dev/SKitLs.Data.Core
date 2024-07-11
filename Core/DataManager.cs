@@ -1,37 +1,35 @@
-﻿using System.Runtime.InteropServices;
-using SKitLs.Data.Core.Banks;
+﻿using SKitLs.Data.Core.Banks;
+using SKitLs.Data.IO;
+using SKitLs.Utils.Exceptions.Internal;
 
 namespace SKitLs.Data.Core.Core
 {
-    public interface IDataManager
-    {
-        public List<DataBankInfo> GetNotations();
-
-        public List<IDataBank> GetBanks();
-        public IDataBank ResolveBank(Type bankType);
-        public IDataBank ResolveBank<TData>();
-        public IDataBank<TId, TData> ResolveBank<TId, TData>() where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>;
-
-        public void Add<TId, TData>(IDataBank<TId, TData> bank) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>;
-
-        public void Initialize();
-        public Task InitializeAsync();
-    }
-
+    /// <summary>
+    /// Implementation of <see cref="IDataManager"/> that manages various data banks.
+    /// </summary>
     public class DataManager : IDataManager
     {
-        private List<IDataBank> Banks { get; set; } = [];
         private List<DataBankInfo> Notations { get; set; } = [];
 
-        public List<IDataBank> GetBanks() => Banks;
-        public IDataBank ResolveBank(Type bankType) => Banks.Find(x => x.InType == bankType) ?? throw new Exception();
-        public IDataBank ResolveBank<TData>() => ResolveBank(typeof(TData));
+        /// <inheritdoc/>
+        public IReadOnlyCollection<DataBankInfo> GetNotations() => Notations;
+
+        private List<IDataBank> Banks { get; set; } = [];
+
+        /// <inheritdoc/>
+        public IEnumerable<IDataBank> GetBanks() => Banks;
+
+        /// <inheritdoc/>
+        /// <exception cref="NotDefinedException">Thrown when a data bank of the specified type is not found.</exception>
+        public IDataBank ResolveBank(Type bankType) => Banks.Where(x => x.HoldingType == bankType).FirstOrDefault() ?? throw new NotDefinedException(bankType);
+
+        /// <inheritdoc/>
+        /// <exception cref="NotDefinedException">Thrown when a data bank of the specified type is not found.</exception>
         public IDataBank<TId, TData> ResolveBank<TId, TData>() where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
-            => (IDataBank<TId, TData>?)Banks.Find(x => x.InType == typeof(TData)) ?? throw new Exception();
+            => (IDataBank<TId, TData>?)Banks.Where(x => x.HoldingType == typeof(TData)).FirstOrDefault() ?? throw new NotDefinedException(typeof(TData));
 
-        public List<DataBankInfo> GetNotations() => Notations;
-
-        public void Add<TId, TData>(IDataBank<TId, TData> bank) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
+        /// <inheritdoc/>
+        public void Declare<TId, TData>(IDataBank<TId, TData> bank) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
         {
             var bankInfo = DataBankInfo.OfDataBank(bank);
             bank.OnBankDataUpdated += (cnt) => bankInfo.Count += cnt;
@@ -40,6 +38,7 @@ namespace SKitLs.Data.Core.Core
             Notations.Add(bankInfo);
         }
 
+        /// <inheritdoc/>
         public void Initialize()
         {
             foreach (var bank in GetBanks())
@@ -47,6 +46,8 @@ namespace SKitLs.Data.Core.Core
                 bank.Initialize();
             }
         }
+
+        /// <inheritdoc/>
         public async Task InitializeAsync()
         {
             foreach (var bank in GetBanks())

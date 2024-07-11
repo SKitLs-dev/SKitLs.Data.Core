@@ -1,226 +1,88 @@
-﻿using SKitLs.Data.Core.Core;
-using SKitLs.Data.Core.IdGenerator;
+﻿using SKitLs.Data.Core.IdGenerator;
 using SKitLs.Data.Core.IO;
-using System.Collections;
-using System.Diagnostics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using SKitLs.Data.IO;
 
 namespace SKitLs.Data.Core.Banks
 {
-    public class DataBank<TId, TData> : IDataBank<TId, TData> where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
+    /// <summary>
+    /// Represents a data bank that manages data with specific ID and data types.
+    /// </summary>
+    /// <typeparam name="TId">The type of the ID of the elements in the bank.</typeparam>
+    /// <typeparam name="TData">The type of the data in the bank.</typeparam>
+    /// <remarks>
+    /// This class provides methods for initializing, reading, writing, and managing data entities within the data bank. 
+    /// It inherits from <see cref="DataBankBase{TId, TData}"/> and implements the necessary interfaces for data management.
+    /// </remarks>
+    public class DataBank<TId, TData> : DataBankBase<TId, TData> where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
     {
-        public event DataBankUpdatedHandler? OnBankInfoUpdated;
-        public event DataBankCollectionUpdatedHandler? OnBankDataUpdated;
-        public event DataBankCollectionUpdatedHandler<TId, TData>? OnBankDataAdded;
-        public event DataBankCollectionUpdatedHandler<TId, TData>? OnBankDataRemoved;
-
-        public string Id => InType.Name.ToLower();
-
-        public string? Name { get; set; }
-
-        public string? Description { get; set; }
-
-        public Type InType => typeof(TData);
-
-
-        private SortedList<TId, TData> _data = [];
-
-        public long Count => _data.Count;
-
-        public DropStrategy DropStrategy { get; init; }
-
+        /// <summary>
+        /// Gets or sets the ID generator for the data bank.
+        /// </summary>
         public IIdGenerator<TId>? IdGenerator { get; init; }
+
+        /// <summary>
+        /// Gets or sets the data reader for the data bank.
+        /// </summary>
         public IDataReader? Reader { get; init; }
+
+        /// <summary>
+        /// Gets or sets the data writer for the data bank.
+        /// </summary>
         public IDataWriter? Writer { get; init; }
 
-        public Func<TData>? NewInstanceGenerator { get; init; }
+        /// <summary>
+        /// Gets or sets the function to generate a new instance of TData.
+        /// </summary>
+        public Func<TData> NewInstanceGenerator { get; init; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataBank{TId, TData}"/> class with the specified name, description, and drop strategy.
+        /// </summary>
+        /// <param name="name">The name of the data bank.</param>
+        /// <param name="description">The description of the data bank.</param>
+        /// <param name="dropStrategy">The strategy to use when dropping data.</param>
         public DataBank(string name, string? description, DropStrategy dropStrategy)
         {
             Name = name;
             Description = description ?? "No more info";
             DropStrategy = dropStrategy;
+            NewInstanceGenerator ??= ActivatorGenerator;
         }
 
-        public DataBank(IDataReader<TData> reader, IDataWriter<TData> writer, string name, string? description = null, DropStrategy dropStrategy = DropStrategy.Disable, IIdGenerator<TId>? idGenerator = null) : this(name, description, dropStrategy)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataBank{TId, TData}"/> class with the specified parameters.
+        /// </summary>
+        /// <param name="notation">The data bank notation containing name and description.</param>
+        /// <param name="reader">The data reader to use for the data bank.</param>
+        /// <param name="writer">The data writer to use for the data bank.</param>
+        /// <param name="idGenerator">The ID generator for the data bank.</param>
+        /// <param name="instanceGenerator">Optional: The function to generate a new instance of TData.</param>
+        /// <param name="dropStrategy">The strategy to use when dropping data.</param>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="notation"/> holding type does not match the type of <typeparamref name="TData"/>.</exception>
+        public DataBank(DataBankInfo notation, IDataReader<TData> reader, IDataWriter<TData> writer, IIdGenerator<TId>? idGenerator, Func<TData>? instanceGenerator = null, DropStrategy dropStrategy = DropStrategy.Disable) : this(notation.Name, notation.Description, dropStrategy)
         {
+            if(notation.InType != typeof(TData))
+                throw new ArgumentException($"Notation holding type mismatch in bank '{Id}'", nameof(notation));
+
             Reader = reader;
             Writer = writer;
+            NewInstanceGenerator = instanceGenerator ?? ActivatorGenerator;
             IdGenerator = idGenerator;
         }
 
-        public void Initialize()
-        {
-            (Reader?.ReadData<TData>().ToList() ?? throw new NullReferenceException()).ForEach(x => _data.Add(x.GetId(), x));
-        }
+        // TODO Exception
+        private static TData ActivatorGenerator() => (TData?)Activator.CreateInstance(typeof(TData)) ?? throw new NullReferenceException();
 
-        public async Task InitializeAsync()
-        {
-            if (Reader is not null)
-            {
-                var read = await Reader.ReadDataAsync<TData>(null);
-                read.ToList().ForEach(x => _data.Add(x.GetId(), x));
-            }
-            else
-                throw new NullReferenceException();
-        }
+        /// <inheritdoc/>
+        public override TData BuildNewData() => NewInstanceGenerator.Invoke();
 
-        public TData BuildNewData()
-        {
-            var @new = NewInstanceGenerator?.Invoke() ?? throw new NotImplementedException();
-            if (IdGenerator is null)
-                throw new NullReferenceException();
-            @new.SetId(IdGenerator.GetDefaultId());
-            return @new;
-        }
+        /// <inheritdoc/>
+        public override IDataReader? GetReader() => Reader;
 
-        public object BuildNewObject() => BuildNewData();
+        /// <inheritdoc/>
+        public override IDataWriter? GetWriter() => Writer;
 
-        public void AddNSave<T>(T data) where T : class
-        {
-            if (typeof(T) == typeof(TData))
-                AddNSave((data as TData)!);
-            else
-                throw new NotSupportedException($"Cannot insert {typeof(T)} values to {typeof(TData)} bank.");
-        }
-        public void AddNSave<T>(IEnumerable<T> dataCollection) where T : class
-        {
-            if (typeof(T) == typeof(TData) || dataCollection.FirstOrDefault()?.GetType() == typeof(TData))
-                AddNSave(dataCollection.Select(x => (x as TData)!));
-            else
-                throw new NotSupportedException($"Cannot insert {typeof(T)} values to {typeof(TData)} bank.");
-        }
-
-        public void AddNSave(TData data)
-        {
-            if (IdGenerator?.IsDefaultID(data.GetId()) ?? true)
-            {
-                data.OnSaveRequested += (s, e) =>
-                {
-                    if (s is TData data)
-                        SaveObject(data);
-                    else throw new Exception();
-                };
-                if (IdGenerator is not null)
-                    data.SetId(IdGenerator.GenerateIdFor(this));
-                _data.Add(data.GetId(), data);
-            }
-            SaveObject(data);
-            OnBankDataUpdated?.Invoke(1);
-            OnBankDataAdded?.Invoke([data]);
-        }
-        public void AddNSave(IEnumerable<TData> dataCollection)
-        {
-            foreach (var data in dataCollection)
-            {
-                if (IdGenerator?.IsDefaultID(data.GetId()) ?? true)
-                {
-                    data.OnSaveRequested += (s, e) =>
-                    {
-                        if (s is TData data)
-                            SaveObject(data);
-                        else throw new Exception();
-                    };
-                    if (IdGenerator is not null)
-                        data.SetId(IdGenerator.GenerateIdFor(this));
-                    _data.Add(data.GetId(), data);
-                }
-            }
-            SaveObjects(dataCollection);
-            OnBankDataUpdated?.Invoke(dataCollection.Count());
-            OnBankDataAdded?.Invoke(dataCollection);
-        }
-
-        public void SaveObject(TData @object)
-        {
-            try
-            {
-                Writer?.WriteData(@object);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
-        }
-
-        public void SaveObjects(IEnumerable<TData> objects)
-        {
-            try
-            {
-                Writer?.WriteData(objects);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
-        }
-
-        public void DropNSave(object data)
-        {
-            if (data.GetType() == typeof(TData))
-                DropNSave((data as TData)!);
-            else
-                throw new Exception();
-        }
-
-        public void DropNSave(TData data)
-        {
-            try
-            {
-                data.Disable();
-                SaveObject(data);
-                OnBankDataUpdated?.Invoke(1);
-                OnBankDataRemoved?.Invoke([data]);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
-        }
-
-        public IReadOnlyList<TData> GetReadonlyData() => [.. _data.Values.Where(x => x.IsEnabled)];
-        public IReadOnlyList<object> GetReadonlyObjects() => GetReadonlyData();
-
-        public bool Drop(Func<TData, bool> predicate) => throw new NotImplementedException();
-
-        public int DropAll(Func<TData, bool> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IdData<TId, TData> GetData(TId id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IdData<TId, TData> GetData(Func<TData, bool> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<IdData<TId, TData>> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        public TData GetValue(TId id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TData GetValue(Func<TData, bool> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int LoadData<TIn>(List<TIn> data)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc/>
+        public override IIdGenerator<TId>? GetIdGenerator() => IdGenerator;
     }
 }
