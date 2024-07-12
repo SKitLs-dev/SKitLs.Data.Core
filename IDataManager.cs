@@ -1,7 +1,7 @@
 ﻿using SKitLs.Data.Core.Banks;
 using SKitLs.Data.IO;
 
-namespace SKitLs.Data.Core.Core
+namespace SKitLs.Data.Core
 {
     /// <summary>
     /// Interface representing a data manager that handles various data banks.

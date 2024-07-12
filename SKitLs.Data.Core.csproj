@@ -24,7 +24,7 @@ It offers a unified interface for handling data, ensuring automatic data persist
 (~) Updated: LICENSE</PackageReleaseNotes>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>$(AssemblyVersion)-preview.0</Version>
+    <Version>$(AssemblyVersion)-preview.1</Version>
     <IncludeSymbols>False</IncludeSymbols>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>

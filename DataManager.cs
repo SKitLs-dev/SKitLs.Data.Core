@@ -2,7 +2,7 @@
 using SKitLs.Data.IO;
 using SKitLs.Utils.Exceptions.Internal;
 
-namespace SKitLs.Data.Core.Core
+namespace SKitLs.Data.Core
 {
     /// <summary>
     /// Implementation of <see cref="IDataManager"/> that manages various data banks.
