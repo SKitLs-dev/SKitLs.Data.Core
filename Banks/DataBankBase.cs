@@ -42,7 +42,10 @@ namespace SKitLs.Data.Core.Banks
         public Type HoldingType => typeof(TData);
 
         /// <inheritdoc/>
-        public long Count => Data.Count;
+        public long Count => GetReadonly().Count;
+
+        /// <inheritdoc/>
+        public long CountAll => GetAllReadonly().Count;
 
         /// <summary>
         /// 
@@ -79,6 +82,10 @@ namespace SKitLs.Data.Core.Banks
         {
             var reader = GetReader() ?? throw NullReader;
             var read = reader.ReadData<TData>();
+            foreach (var item in read)
+            {
+                Data.Add(item.GetId(), item);
+            }
             UpdateSave(read);
         }
 
@@ -108,7 +115,7 @@ namespace SKitLs.Data.Core.Banks
         /// <inheritdoc/>
         /// <inheritdoc cref="IDataWriter{T}.WriteData(IEnumerable{T})"/>
         /// <exception cref="NullReferenceException">Thrown when the <see cref="GetWriter"/> is <see langword="null"/>.</exception>
-        private void SaveObjects(IEnumerable<TData> objects) => (GetWriter() ?? throw NullWriter).WriteData(objects);
+        private void SaveObjects(IEnumerable<TData> objects) => (GetWriter() ?? throw NullWriter).WriteDataList(objects);
 
         /// <inheritdoc/>
         /// <inheritdoc cref="IDataWriter{T}.WriteDataAsync(T, CancellationTokenSource?)"/>
@@ -125,7 +132,7 @@ namespace SKitLs.Data.Core.Banks
         private async Task SaveObjectsAsync(IEnumerable<TData> objects, CancellationTokenSource? cts = null)
         {
             var writer = GetWriter() ?? throw NullWriter;
-            await writer.WriteDataAsync(objects, cts);
+            await writer.WriteDataListAsync(objects, cts);
         }
 
         // GET
@@ -258,6 +265,7 @@ namespace SKitLs.Data.Core.Banks
                 try
                 {
                     Data.Remove(value.GetId());
+                    SaveObjects(GetAllReadonlyData());
                 }
                 catch (Exception)
                 {
@@ -308,6 +316,10 @@ namespace SKitLs.Data.Core.Banks
             if (DropStrategy == DropStrategy.Disable)
             {
                 SaveObjects(affected);
+            }
+            else
+            {
+                SaveObjects(GetAllReadonlyData());
             }
             OnBankDataUpdated?.Invoke(affected.Count);
             OnBankDataDropped?.Invoke(affected);

@@ -1,6 +1,5 @@
 ﻿using SKitLs.Data.Core.Banks;
 using SKitLs.Data.IO;
-using SKitLs.Utils.Exceptions.Internal;
 
 namespace SKitLs.Data.Core
 {
@@ -21,18 +20,21 @@ namespace SKitLs.Data.Core
 
         /// <inheritdoc/>
         /// <exception cref="NotDefinedException">Thrown when a data bank of the specified type is not found.</exception>
-        public IDataBank ResolveBank(Type bankType) => Banks.Where(x => x.HoldingType == bankType).FirstOrDefault() ?? throw new NotDefinedException(bankType);
+        public IDataBank ResolveBank(Type bankType) => Banks.Where(x => x.HoldingType == bankType).FirstOrDefault() ?? throw new NullReferenceException(); //NotDefinedException(bankType);
 
         /// <inheritdoc/>
         /// <exception cref="NotDefinedException">Thrown when a data bank of the specified type is not found.</exception>
         public IDataBank<TId, TData> ResolveBank<TId, TData>() where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
-            => (IDataBank<TId, TData>?)Banks.Where(x => x.HoldingType == typeof(TData)).FirstOrDefault() ?? throw new NotDefinedException(typeof(TData));
+            => (IDataBank<TId, TData>?)Banks.Where(x => x.HoldingType == typeof(TData)).FirstOrDefault() ?? throw new NullReferenceException(); // NotDefinedException(typeof(TData));
 
         /// <inheritdoc/>
         public void Declare<TId, TData>(IDataBank<TId, TData> bank) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
         {
             var bankInfo = DataBankInfo.OfDataBank(bank);
-            bank.OnBankDataUpdated += (cnt) => bankInfo.Count += cnt;
+            bank.OnBankDataUpdated += (cnt) =>
+            {
+                bankInfo.Count += cnt;
+            };
 
             Banks.Add(bank);
             Notations.Add(bankInfo);

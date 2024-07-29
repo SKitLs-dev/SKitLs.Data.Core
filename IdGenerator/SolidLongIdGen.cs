@@ -36,11 +36,10 @@ namespace SKitLs.Data.Core.IdGenerator
         /// <inheritdoc/>
         public long GenerateId() => Random.NextInt64();
 
-        // TODO !
         /// <inheritdoc/>
         public long GenerateIdFor<TData>(IDataBank<long, TData> bank) where TData : ModelDso<long>
         {
-            return bank.GetReadonlyData().Select(x => x.GetId()).FirstAvailableValue((int)StartId);
+            return bank.GetAllReadonlyData().Select(x => x.GetId()).FirstAvailableValue(StartId);
         }
     }
 }

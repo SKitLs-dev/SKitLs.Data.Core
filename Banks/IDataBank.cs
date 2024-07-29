@@ -75,9 +75,14 @@ namespace SKitLs.Data.Core.Banks
         public string? Description { get; }
 
         /// <summary>
-        /// Gets the count of items in the data bank.
+        /// Gets the count of available items in the data bank.
         /// </summary>
         public long Count { get; }
+
+        /// <summary>
+        /// Gets the count of all items in the data bank.
+        /// </summary>
+        public long CountAll => GetAllReadonly().Count;
 
         /// <summary>
         /// Gets the strategy used for handling data drops.

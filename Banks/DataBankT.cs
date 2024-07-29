@@ -74,7 +74,15 @@ namespace SKitLs.Data.Core.Banks
         private static TData ActivatorGenerator() => (TData?)Activator.CreateInstance(typeof(TData)) ?? throw new NullReferenceException();
 
         /// <inheritdoc/>
-        public override TData BuildNewData() => NewInstanceGenerator.Invoke();
+        public override TData BuildNewData()
+        {
+            if (IdGenerator is null)
+                throw new NullReferenceException(nameof(IdGenerator));
+
+            var @new = NewInstanceGenerator.Invoke();
+            @new.SetId(IdGenerator.GetDefaultId());
+            return @new;
+        }
 
         /// <inheritdoc/>
         public override IDataReader? GetReader() => Reader;

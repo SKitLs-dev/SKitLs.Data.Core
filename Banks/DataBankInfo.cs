@@ -9,7 +9,7 @@ namespace SKitLs.Data.Core.Banks
     /// <param name="inType">The type of data stored in the data bank.</param>
     /// <param name="name">Optional: The name of the data bank. If not provided, a default name based on the data type will be used.</param>
     /// <param name="description">Optional: The description of the data bank.</param>
-    public struct DataBankInfo(long count, Type inType, string? name = null, string? description = null)
+    public class DataBankInfo(long count, Type inType, string? name = null, string? description = null)
     {
         /// <summary>
         /// Gets or sets the number of items in the data bank.
