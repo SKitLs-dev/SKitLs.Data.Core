@@ -71,7 +71,7 @@ namespace SKitLs.Data.Core.Banks
         }
 
         // TODO Exception
-        private static TData ActivatorGenerator() => (TData?)Activator.CreateInstance(typeof(TData)) ?? throw new NullReferenceException();
+        private static TData ActivatorGenerator() => Activator.CreateInstance<TData>() ?? throw new NullReferenceException();
 
         /// <inheritdoc/>
         public override TData BuildNewData()

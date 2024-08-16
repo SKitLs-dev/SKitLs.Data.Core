@@ -13,21 +13,15 @@ It offers a unified interface for handling data, ensuring automatic data persist
     <PackageProjectUrl>https://github.com/SKitLs-dev/SKitLs.Data.Core</PackageProjectUrl>
     <PackageIcon>sk.dt.core.png</PackageIcon>
     <PackageTags>data-management</PackageTags>
-    <PackageReleaseNotes>DataBanks:
-(!) Fixed: DataBanks now reads data on Initilize()
-(!) Fixed: DataBanks now saves objects properly (since .Data.IO v.2.0.0 release)
-(!) Fixed: DataBanks now drops objects properly on Delete strategy
-(~) Updated: BuildNewData() now overrides Id to a default one
-(~) Updated: DayaBankInfo now is a class
-(~) Updated: Count now returns only available count
-(+) Added: CountAll property for getting all values count
+    <PackageReleaseNotes>DataManager:
+(+) Added: string DataFolderPath
+(+) Added: Class-Oriented declarations via void InitializeDeclarations()
+(+) Added: JsonBank() shortcut declaration
+(+) Added: EfBank() shortcut declaration
+(~) Fixed: binding Count to the DataBankInfo on OnBankDataUpdated()
 
-IdGens:
-(~) Fixed: SolidLongIdGen new id retrieving for DropStrategy = Disable
-(+) Added: GuidIdGenrator
-
-(~) Minor updates</PackageReleaseNotes>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
+(~) Some Minor Internal Updates</PackageReleaseNotes>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Version>$(AssemblyVersion)</Version>
     <IncludeSymbols>False</IncludeSymbols>
@@ -45,7 +39,7 @@ IdGens:
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SKitLs.Data.IO" Version="2.0.1" />
+    <PackageReference Include="SKitLs.Data.IO" Version="2.0.4" />
     <PackageReference Include="SKitLs.Utils.Extensions" Version="0.2.0" />
   </ItemGroup>
 
