@@ -1,5 +1,9 @@
-﻿using SKitLs.Data.IO;
+﻿using Microsoft.EntityFrameworkCore;
+using SKitLs.Data.Core.IdGenerator;
+using SKitLs.Data.Core.IO.EfDbContext;
+using SKitLs.Data.IO;
 using SKitLs.Data.IO.Json;
+using SKitLs.Data.IO.Shortcuts;
 
 namespace SKitLs.Data.Core.Banks
 {
@@ -15,52 +19,86 @@ namespace SKitLs.Data.Core.Banks
     public static class DBankExtensions
     {
         /// <summary>
-        /// Configures a data bank to use JSON-based input/output (IO) in a single JSON file.
+        /// Creates a data bank of type <typeparamref name="TData"/> with a default JSON-based Reader/Writer in the manager's folder (<see cref="IDataManager.DataFolderPath"/>).
+        /// The bank uses the provided <paramref name="idGenerator"/> to generate unique identifiers.
+        /// <para/>
+        /// The <c>NewInstanceGenerator</c> is implicitly set to use the default constructor of <typeparamref name="TData"/> (requires a parameterless constructor).
         /// </summary>
-        /// <typeparam name="TId">The type of the identifier in the data bank.</typeparam>
-        /// <typeparam name="TData">The type of data stored in the data bank.</typeparam>
-        /// <param name="bank">The data bank to configure.</param>
-        /// <returns>The configured data bank with JSON-based reader/writer.</returns>
-        /// <remarks>
-        /// The method sets up a JSON reader and writer that operate on a single JSON file located in the manager's data folder.
-        /// The file is named after the <see cref="IDataBank.HoldingType"/> of the bank.
-        /// </remarks>
+        /// <typeparam name="TId">The type of the identifier, which must implement <see cref="IEquatable{T}"/> and <see cref="IComparable{T}"/>.</typeparam>
+        /// <typeparam name="TData">The type of data stored in the bank, which must inherit from <see cref="ModelDso{TId}"/>.</typeparam>
+        /// <param name="manager">The <see cref="IDataManager"/> instance managing the data bank.</param>
+        /// <param name="idGenerator">The generator used to create unique IDs for data entries.</param>
+        /// <param name="dropStrategy">The strategy for handling data drops, with the default being <see cref="DropStrategy.Disable"/>.</param>
+        /// <returns>An instance of <see cref="IDataBank{TId, TData}"/> configured with JSON-based reader/writer.</returns>
         /// <seealso cref="JsonReader{TData}"/>
         /// <seealso cref="JsonWriter{TData, TId}"/>
-        public static IDataBank<TId, TData> UseJsonIO<TId, TData>(this IDataBank<TId, TData> bank) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
+        public static IDataBank<TId, TData> JsonBank<TId, TData>(this IDataManager manager, IIdGenerator<TId> idGenerator, DropStrategy dropStrategy = DropStrategy.Disable) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
         {
-            var dataFolder = bank.Manager.DataFolderPath;
-            var dataFile = Path.Combine(dataFolder, $"{bank.HoldingType.Name.ToLower()}.json");
-            var reader = new JsonReader<TData>(dataFile);
-            var writer = new JsonWriter<TData, TId>(dataFile);
-            bank.UpdateReader(reader);
-            bank.UpdateWriter(writer);
+            var dbName = typeof(TData).Name;
+            var path = Path.Combine(manager.DataFolderPath, HotIO.FitJsonPath(dbName));
+            var bank = new DataBank<TId, TData>(dbName, null, dropStrategy)
+            {
+                Reader = new JsonReader<TData>(path) { CreateNewFile = true },
+                Writer = new JsonWriter<TData, TId>(path),
+                IdGenerator = idGenerator,
+            };
+            manager.Declare(bank);
             return bank;
         }
 
         /// <summary>
-        /// Configures a data bank to use JSON-based input/output (IO) with split files, where each record is stored in a separate file.
+        /// Creates a data bank of type <typeparamref name="TData"/> with a split-file JSON-based Reader/Writer in the manager's folder (<see cref="IDataManager.DataFolderPath"/>).
+        /// The bank uses the provided <paramref name="idGenerator"/> to generate unique identifiers.
+        /// <para/>
+        /// The <c>NewInstanceGenerator</c> is implicitly set to use the default constructor of <typeparamref name="TData"/> (requires a parameterless constructor).
         /// </summary>
-        /// <typeparam name="TId">The type of the identifier in the data bank.</typeparam>
-        /// <typeparam name="TData">The type of data stored in the data bank.</typeparam>
-        /// <param name="bank">The data bank to configure.</param>
-        /// <returns>The configured data bank with split JSON-based reader/writer.</returns>
-        /// <remarks>
-        /// The method sets up a JSON reader and writer that operate on multiple JSON files, each representing a single data entity.
-        /// These files are stored in a subfolder named after the <see cref="IDataBank.HoldingType"/> of the bank.
-        /// </remarks>
+        /// <typeparam name="TId">The type of the identifier, which must implement <see cref="IEquatable{T}"/> and <see cref="IComparable{T}"/>.</typeparam>
+        /// <typeparam name="TData">The type of data stored in the bank, which must inherit from <see cref="ModelDso{TId}"/>.</typeparam>
+        /// <param name="manager">The <see cref="IDataManager"/> instance managing the data bank.</param>
+        /// <param name="idGenerator">The generator used to create unique IDs for data entries.</param>
+        /// <param name="dropStrategy">The strategy for handling data drops, with the default being <see cref="DropStrategy.Disable"/>.</param>
+        /// <returns>An instance of <see cref="IDataBank{TId, TData}"/> configured with split-file JSON-based reader/writer.</returns>
         /// <seealso cref="JsonSplitReader{TData}"/>
         /// <seealso cref="JsonSplitWriter{TData, TId}"/>
-        public static IDataBank<TId, TData> UseSplitJsonIO<TId, TData>(this IDataBank<TId, TData> bank) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
+        public static IDataBank<TId, TData> JsonSplitBank<TId, TData>(this IDataManager manager, IIdGenerator<TId> idGenerator, DropStrategy dropStrategy = DropStrategy.Disable) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
         {
-            var dataSubFolder = Path.Combine(bank.Manager.DataFolderPath, bank.HoldingType.Name.ToLower());
-            if (!Directory.Exists(dataSubFolder))
-                Directory.CreateDirectory(dataSubFolder);
+            var dbName = typeof(TData).Name;
+            var path = Path.Combine(manager.DataFolderPath, HotIO.FitJsonPath(dbName));
+            var bank = new DataBank<TId, TData>(dbName, null, dropStrategy)
+            {
+                Reader = new JsonSplitReader<TData>(path) { CreateNewFile = true },
+                Writer = new JsonSplitWriter<TData, TId>(path),
+                IdGenerator = idGenerator,
+            };
+            manager.Declare(bank);
+            return bank;
+        }
 
-            var reader = new JsonSplitReader<TData>(dataSubFolder);
-            var writer = new JsonSplitWriter<TData, TId>(dataSubFolder);
-            bank.UpdateReader(reader);
-            bank.UpdateWriter(writer);
+        /// <summary>
+        /// Creates a data bank of type <typeparamref name="TData"/> with default Entity Framework-based Reader/Writer for database interactions.
+        /// The bank uses the provided <paramref name="idGenerator"/> to generate unique identifiers.
+        /// <para/>
+        /// The <c>NewInstanceGenerator</c> is implicitly set to use the default constructor of <typeparamref name="TData"/> (requires a parameterless constructor).
+        /// </summary>
+        /// <typeparam name="TId">The type of the identifier, which must implement <see cref="IEquatable{T}"/> and <see cref="IComparable{T}"/>.</typeparam>
+        /// <typeparam name="TData">The type of data stored in the bank, which must inherit from <see cref="ModelDso{TId}"/>.</typeparam>
+        /// <param name="manager">The <see cref="IDataManager"/> instance managing the data bank.</param>
+        /// <param name="context">The <see cref="DbContext"/> used for database interactions.</param>
+        /// <param name="idGenerator">The generator used to create unique IDs for data entries.</param>
+        /// <param name="dropStrategy">The strategy for handling data drops, with the default being <see cref="DropStrategy.Disable"/>.</param>
+        /// <returns>An instance of <see cref="IDataBank{TId, TData}"/> initialized with Entity Framework reader/writer.</returns>
+        /// <seealso cref="DbReader{TData}"/>
+        /// <seealso cref="DbWriter{TData, TId}"/>
+        public static IDataBank<TId, TData> EfBank<TId, TData>(this IDataManager manager, DbContext context, IIdGenerator<TId>? idGenerator, DropStrategy dropStrategy = DropStrategy.Disable) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
+        {
+            var dbName = typeof(TData).Name;
+            var bank = new DataBank<TId, TData>(dbName, null, dropStrategy)
+            {
+                Reader = new DbReader<TData>(context),
+                Writer = new DbWriter<TData, TId>(context),
+                IdGenerator = idGenerator,
+            };
+            manager.Declare(bank);
             return bank;
         }
     }

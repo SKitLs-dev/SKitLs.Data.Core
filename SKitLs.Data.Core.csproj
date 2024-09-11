@@ -13,7 +13,10 @@ It offers a unified interface for handling data, ensuring automatic data persist
     <PackageProjectUrl>https://github.com/SKitLs-dev/SKitLs.Data.Core</PackageProjectUrl>
     <PackageIcon>sk.dt.core.png</PackageIcon>
     <PackageTags>data-management</PackageTags>
-    <PackageReleaseNotes>(+) Added (beta): DBankExtensions static class with some methods for easier I/O integration shortcuts
+    <PackageReleaseNotes>(!) Breaking: DataManager.JsonBank DataManager.EfBank moved to DBankExtensions
+
+(+) Added (beta): DBankExtensions static class with some methods for easier I/O integration shortcuts
+(-) Removed: DBankExtensions.UseSplitJsonIO DBankExtensions.UseJsonIO beta shortcuts
 
 (~) Updated: DataManager.DataFolderPath moved to IDataManager interface
 (~) Updated: DataManager default data folder is set to 'Resources/Data'
@@ -27,7 +30,7 @@ It offers a unified interface for handling data, ensuring automatic data persist
 (~) Updated XML-Docs</PackageReleaseNotes>
     <AssemblyVersion>1.2.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>$(AssemblyVersion)-preview.0</Version>
+    <Version>$(AssemblyVersion)-preview.1</Version>
     <IncludeSymbols>False</IncludeSymbols>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
