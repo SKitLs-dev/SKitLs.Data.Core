@@ -16,9 +16,7 @@ namespace SKitLs.Data.Core
     /// </summary>
     public class DataManager : IDataManager
     {
-        /// <summary>
-        /// Gets the data folder path.
-        /// </summary>
+        /// <inheritdoc/>
         public string DataFolderPath { get; init; }
 
         private List<DataBankInfo> Notations { get; set; } = [];
@@ -35,7 +33,7 @@ namespace SKitLs.Data.Core
         /// Initializes a new instance of the <see cref="DataManager"/> class, setting up the specified data folder.
         /// </summary>
         /// <param name="dataFolderPath">The path to the folder where data will be managed and stored.</param>
-        public DataManager(string dataFolderPath)
+        public DataManager(string dataFolderPath = "Resources/Data")
         {
             if (!Directory.Exists(dataFolderPath))
             {
@@ -49,17 +47,18 @@ namespace SKitLs.Data.Core
         }
 
         /// <inheritdoc/>
-        /// <exception cref="NotDefinedException">Thrown when a data bank of the specified type is not found.</exception>
+        /// <exception cref="NullReferenceException">Thrown when a data bank of the specified type is not found.</exception>
         public IDataBank ResolveBank(Type bankType) => Banks.Where(x => x.HoldingType == bankType).FirstOrDefault() ?? throw new NullReferenceException(); //NotDefinedException(bankType);
 
         /// <inheritdoc/>
-        /// <exception cref="NotDefinedException">Thrown when a data bank of the specified type is not found.</exception>
+        /// <exception cref="NullReferenceException">Thrown when a data bank of the specified type is not found.</exception>
         public IDataBank<TId, TData> ResolveBank<TId, TData>() where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
             => (IDataBank<TId, TData>?)Banks.Where(x => x.HoldingType == typeof(TData)).FirstOrDefault() ?? throw new NullReferenceException(); // NotDefinedException(typeof(TData));
 
         /// <inheritdoc/>
         public void Declare<TId, TData>(IDataBank<TId, TData> bank) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
         {
+            bank.Manager = this;
             var bankInfo = DataBankInfo.OfDataBank(bank);
             bank.OnBankDataUpdated += (cnt) =>
             {

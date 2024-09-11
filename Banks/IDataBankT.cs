@@ -111,7 +111,7 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="value">The data to add/update and save.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns><see langword="true"/> if the data was added; otherwise (if updated), <see langword="false"/>.</returns>
-        public Task<bool> UpdateSaveAsync(TData value, CancellationTokenSource? cts);
+        public Task<bool> UpdateSaveAsync(TData value, CancellationTokenSource? cts = null);
 
         /// <summary>
         /// Updates and saves a collection of data to the bank asynchronously.
@@ -119,7 +119,7 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="values">The collection of data to add/update and save.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns>The number of elements added.</returns>
-        public Task<int> UpdateSaveAsync(IEnumerable<TData> values, CancellationTokenSource? cts);
+        public Task<int> UpdateSaveAsync(IEnumerable<TData> values, CancellationTokenSource? cts = null);
 
         /// <summary>
         /// Drops the specified data from the bank asynchronously.
@@ -127,7 +127,7 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="value">The data to drop and remove.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns><see langword="true"/> if the data was dropped; otherwise <see langword="false"/>.</returns>
-        public Task<bool> DropSaveAsync(TData value, CancellationTokenSource? cts);
+        public Task<bool> DropSaveAsync(TData value, CancellationTokenSource? cts = null);
 
         /// <summary>
         /// Asynchronously drops and removes the specified collection of data from the bank.
@@ -135,7 +135,7 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="values">The collection of data to remove.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns>The number of elements removed.</returns>
-        public Task<int> DropSaveAsync(IEnumerable<TData> values, CancellationTokenSource? cts);
+        public Task<int> DropSaveAsync(IEnumerable<TData> values, CancellationTokenSource? cts = null);
 
         // SELECTORS
         /// <summary>
@@ -151,6 +151,6 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="predicate">The predicate to match data to drop.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns>The number of elements removed.</returns>
-        public Task<int> DropSaveWhereAsync(Func<TData, bool> predicate, CancellationTokenSource? cts);
+        public Task<int> DropSaveWhereAsync(Func<TData, bool> predicate, CancellationTokenSource? cts = null);
     }
 }

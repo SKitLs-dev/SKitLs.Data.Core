@@ -23,12 +23,12 @@ namespace SKitLs.Data.Core.Banks
         /// <summary>
         /// Gets or sets the data reader for the data bank.
         /// </summary>
-        public IDataReader? Reader { get; init; }
+        public IDataReader? Reader { get; internal set; }
 
         /// <summary>
         /// Gets or sets the data writer for the data bank.
         /// </summary>
-        public IDataWriter? Writer { get; init; }
+        public IDataWriter? Writer { get; internal set; }
 
         /// <summary>
         /// Gets or sets the function to generate a new instance of TData.
@@ -41,9 +41,9 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="name">The name of the data bank.</param>
         /// <param name="description">The description of the data bank.</param>
         /// <param name="dropStrategy">The strategy to use when dropping data.</param>
-        public DataBank(string name, string? description, DropStrategy dropStrategy)
+        public DataBank(string? name = null, string? description = null, DropStrategy dropStrategy = DropStrategy.Disable)
         {
-            Name = name;
+            Name = name ?? typeof(TData).Name.ToLower();
             Description = description ?? "No more info";
             DropStrategy = dropStrategy;
             NewInstanceGenerator ??= ActivatorGenerator;
@@ -88,7 +88,13 @@ namespace SKitLs.Data.Core.Banks
         public override IDataReader? GetReader() => Reader;
 
         /// <inheritdoc/>
+        public override void UpdateReader(IDataReader reader) => Reader = reader;
+
+        /// <inheritdoc/>
         public override IDataWriter? GetWriter() => Writer;
+
+        /// <inheritdoc/>
+        public override void UpdateWriter(IDataWriter writer) => Writer = writer;
 
         /// <inheritdoc/>
         public override IIdGenerator<TId>? GetIdGenerator() => IdGenerator;

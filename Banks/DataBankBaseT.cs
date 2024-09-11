@@ -17,6 +17,14 @@ namespace SKitLs.Data.Core.Banks
     /// </remarks>
     public abstract class DataBankBase<TId, TData> : IDataBank<TId, TData> where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
     {
+        private IDataManager? _dm;
+        /// <inheritdoc/>
+        public IDataManager Manager
+        {
+            get => _dm ?? throw new NullReferenceException();
+            set => _dm = value;
+        }
+
         /// <inheritdoc/>
         public event DataBankUpdatedHandler? OnBankInfoUpdated;
 
@@ -59,15 +67,36 @@ namespace SKitLs.Data.Core.Banks
         public abstract IDataReader? GetReader();
 
         /// <inheritdoc/>
+        public abstract void UpdateReader(IDataReader reader);
+
+        /// <inheritdoc/>
         public abstract IDataWriter? GetWriter();
+
+        /// <inheritdoc/>
+        public abstract void UpdateWriter(IDataWriter writer);
 
         /// <inheritdoc/>
         public abstract IIdGenerator<TId>? GetIdGenerator();
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected Exception NullReader => new NullReferenceException($"Null Reader in DataBank '{Id}'");
+        /// <summary>
+        /// 
+        /// </summary>
         protected Exception NullWriter => new NullReferenceException($"Null Writer in DataBank '{Id}'");
+        /// <summary>
+        /// 
+        /// </summary>
         protected Exception NullIdGen => new NullReferenceException($"Null Id Generator in DataBank '{Id}'");
+        /// <summary>
+        /// 
+        /// </summary>
         protected Exception NoElement => new KeyNotFoundException($"Element not found");
+        /// <summary>
+        /// 
+        /// </summary>
         protected Exception NotSupported(Type attempt, Type target) => new NotSupportedException($"Cannot handle values of a type '{attempt.Name}' in '{target.Name}' typed bank ('{Id}').");
 
         /// <summary>
@@ -113,7 +142,7 @@ namespace SKitLs.Data.Core.Banks
         private void SaveObject(TData @object) => (GetWriter() ?? throw NullWriter).WriteData(@object);
 
         /// <inheritdoc/>
-        /// <inheritdoc cref="IDataWriter{T}.WriteData(IEnumerable{T})"/>
+        /// <inheritdoc cref="IDataWriter{T}.WriteDataList(IEnumerable{T})"/>
         /// <exception cref="NullReferenceException">Thrown when the <see cref="GetWriter"/> is <see langword="null"/>.</exception>
         private void SaveObjects(IEnumerable<TData> objects) => (GetWriter() ?? throw NullWriter).WriteDataList(objects);
 
@@ -127,7 +156,7 @@ namespace SKitLs.Data.Core.Banks
         }
 
         /// <inheritdoc/>
-        /// <inheritdoc cref="IDataWriter{T}.WriteDataAsync(IEnumerable{T}, CancellationTokenSource?)"/>
+        /// <inheritdoc cref="IDataWriter{T}.WriteDataListAsync(IEnumerable{T}, CancellationTokenSource?)"/>
         /// <exception cref="NullReferenceException">Thrown when the <see cref="GetWriter"/> is <see langword="null"/>.</exception>
         private async Task SaveObjectsAsync(IEnumerable<TData> objects, CancellationTokenSource? cts = null)
         {

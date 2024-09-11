@@ -13,17 +13,21 @@ It offers a unified interface for handling data, ensuring automatic data persist
     <PackageProjectUrl>https://github.com/SKitLs-dev/SKitLs.Data.Core</PackageProjectUrl>
     <PackageIcon>sk.dt.core.png</PackageIcon>
     <PackageTags>data-management</PackageTags>
-    <PackageReleaseNotes>DataManager:
-(+) Added: string DataFolderPath
-(+) Added: Class-Oriented declarations via void InitializeDeclarations()
-(+) Added: JsonBank() shortcut declaration
-(+) Added: EfBank() shortcut declaration
-(~) Fixed: binding Count to the DataBankInfo on OnBankDataUpdated()
+    <PackageReleaseNotes>(+) Added (beta): DBankExtensions static class with some methods for easier I/O integration shortcuts
 
-(~) Some Minor Internal Updates</PackageReleaseNotes>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
+(~) Updated: DataManager.DataFolderPath moved to IDataManager interface
+(~) Updated: DataManager default data folder is set to 'Resources/Data'
+
+(~) Added: IDataBank.Manager in refer to IDataManager
+(~) Added: UpdateReader/Writer() methods to IDataBank interface
+(~) Updated: DataBanks interfaces cts is set to null by default
+(~) Updated: DataBanks default file name is set to holding type name by default
+
+(~) Minor internal updates
+(~) Updated XML-Docs</PackageReleaseNotes>
+    <AssemblyVersion>1.2.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>$(AssemblyVersion)</Version>
+    <Version>$(AssemblyVersion)-preview.0</Version>
     <IncludeSymbols>False</IncludeSymbols>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -39,7 +43,7 @@ It offers a unified interface for handling data, ensuring automatic data persist
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SKitLs.Data.IO" Version="2.0.4" />
+    <PackageReference Include="SKitLs.Data.IO" Version="2.2.0" />
     <PackageReference Include="SKitLs.Utils.Extensions" Version="0.2.0" />
   </ItemGroup>
 

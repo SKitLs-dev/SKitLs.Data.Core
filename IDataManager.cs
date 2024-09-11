@@ -9,6 +9,11 @@ namespace SKitLs.Data.Core
     public interface IDataManager
     {
         /// <summary>
+        /// Gets the data folder path.
+        /// </summary>
+        public string DataFolderPath { get; }
+
+        /// <summary>
         /// Retrieves a list of notations for all data banks.
         /// </summary>
         /// <returns>A list of <see cref="DataBankInfo"/> objects representing the notations.</returns>

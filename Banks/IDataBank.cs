@@ -45,6 +45,12 @@ namespace SKitLs.Data.Core.Banks
     public interface IDataBank
     {
         /// <summary>
+        /// Gets or sets the data manager that owns and manages the current data bank.
+        /// </summary>
+        /// <seealso cref="IDataManager"/>
+        public IDataManager Manager { get; internal set; }
+
+        /// <summary>
         /// Occurs when the bank's information is updated.
         /// </summary>
         public event DataBankUpdatedHandler? OnBankInfoUpdated;
@@ -94,10 +100,14 @@ namespace SKitLs.Data.Core.Banks
         /// </summary>
         public IDataReader? GetReader();
 
+        internal void UpdateReader(IDataReader reader);
+
         /// <summary>
         /// Gets the writer used for writing data from the bank.
         /// </summary>
         public IDataWriter? GetWriter();
+
+        internal void UpdateWriter(IDataWriter writer);
 
         /// <summary>
         /// Initializes the data bank synchronously.
@@ -171,7 +181,7 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="value">The data to add/update and save.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns><see langword="true"/> if the data was added; otherwise (if updated), <see langword="false"/>.</returns>
-        public Task<bool> UpdateSaveAsync<T>(T value, CancellationTokenSource? cts) where T : class;
+        public Task<bool> UpdateSaveAsync<T>(T value, CancellationTokenSource? cts = null) where T : class;
 
         /// <summary>
         /// Adds or updates and saves a collection of data to the bank asynchronously.
@@ -180,7 +190,7 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="values">The collection of data to update and save.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns>The number of elements added.</returns>
-        public Task<int> UpdateSaveAsync<T>(IEnumerable<T> values, CancellationTokenSource? cts) where T : class;
+        public Task<int> UpdateSaveAsync<T>(IEnumerable<T> values, CancellationTokenSource? cts = null) where T : class;
 
         /// <summary>
         /// Drops the specified data from the bank using <see cref="DropStrategy"/> asynchronously.
@@ -189,7 +199,7 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="value">The data to drop and remove.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns><see langword="true"/> if the data was dropped; otherwise <see langword="false"/>.</returns>
-        public Task<bool> DropSaveAsync<T>(T value, CancellationTokenSource? cts) where T : class;
+        public Task<bool> DropSaveAsync<T>(T value, CancellationTokenSource? cts = null) where T : class;
 
         /// <summary>
         /// Asynchronously drops and removes the specified collection of data from the bank.
@@ -198,6 +208,6 @@ namespace SKitLs.Data.Core.Banks
         /// <param name="values">The collection of data to remove.</param>
         /// /// <param name="cts">The <see cref="CancellationTokenSource"/> to observe while waiting for the task to complete.</param>
         /// <returns>The number of elements added.</returns>
-        public Task<int> DropSaveAsync<T>(IEnumerable<T> values, CancellationTokenSource? cts) where T : class;
+        public Task<int> DropSaveAsync<T>(IEnumerable<T> values, CancellationTokenSource? cts = null) where T : class;
     }
 }
