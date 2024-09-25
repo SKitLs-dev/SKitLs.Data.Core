@@ -123,7 +123,11 @@ namespace SKitLs.Data.Core.Banks
         public async Task InitializeAsync()
         {
             var reader = GetReader() ?? throw NullReader;
-            var read = await reader.ReadDataAsync<TData>(null);
+            var read = await reader.ReadDataAsync<TData>();
+            foreach (var item in read)
+            {
+                Data.Add(item.GetId(), item);
+            }
             UpdateSave(read);
         }
 
@@ -526,7 +530,7 @@ namespace SKitLs.Data.Core.Banks
                 else throw NotSupported(sender.GetType(), typeof(TData));
             };
 
-            data.SetId(gen.GenerateIdFor(this));
+            data.SetId(gen.GenerateIdFor(this, data));
         }
     }
 }

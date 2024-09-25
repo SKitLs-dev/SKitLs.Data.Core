@@ -33,10 +33,11 @@ namespace SKitLs.Data.Core.IdGenerator
         /// </summary>
         /// <typeparam name="TData">The type of data for which the identifier is generated.</typeparam>
         /// <param name="bank">The data bank instance.</param>
+        /// <param name="object">The data object for which the identifier is being generated.</param>
         /// <returns>A new unique identifier.</returns>
         /// <remarks>
         /// The identifier generation is specific to the type of data <typeparamref name="TData"/>, which must be of type <see cref="ModelDso{TId}"/>.
         /// </remarks>
-        public TId GenerateIdFor<TData>(IDataBank<TId, TData> bank) where TData : ModelDso<TId>;
+        public TId GenerateIdFor<TData>(IDataBank<TId, TData> bank, TData @object) where TData : ModelDso<TId>;
     }
 }

@@ -15,7 +15,6 @@ namespace SKitLs.Data.Core.Banks
     /// data banks to be configured with JSON-based IO mechanisms, including both single-file and split-file approaches.
     /// </remarks>
     /// <seealso cref="IDataBank{TId, TData}"/>
-    [Obsolete("Beta")]
     public static class DBankExtensions
     {
         /// <summary>
@@ -63,7 +62,7 @@ namespace SKitLs.Data.Core.Banks
         public static IDataBank<TId, TData> JsonSplitBank<TId, TData>(this IDataManager manager, IIdGenerator<TId> idGenerator, DropStrategy dropStrategy = DropStrategy.Disable) where TId : notnull, IEquatable<TId>, IComparable<TId> where TData : ModelDso<TId>
         {
             var dbName = typeof(TData).Name;
-            var path = Path.Combine(manager.DataFolderPath, HotIO.FitJsonPath(dbName));
+            var path = Path.Combine(manager.DataFolderPath, dbName);
             var bank = new DataBank<TId, TData>(dbName, null, dropStrategy)
             {
                 Reader = new JsonSplitReader<TData>(path) { CreateNewFile = true },

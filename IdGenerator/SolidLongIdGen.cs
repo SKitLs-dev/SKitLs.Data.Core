@@ -37,7 +37,7 @@ namespace SKitLs.Data.Core.IdGenerator
         public long GenerateId() => Random.NextInt64();
 
         /// <inheritdoc/>
-        public long GenerateIdFor<TData>(IDataBank<long, TData> bank) where TData : ModelDso<long>
+        public long GenerateIdFor<TData>(IDataBank<long, TData> bank, TData @object) where TData : ModelDso<long>
         {
             return bank.GetAllReadonlyData().Select(x => x.GetId()).FirstAvailableValue(StartId);
         }

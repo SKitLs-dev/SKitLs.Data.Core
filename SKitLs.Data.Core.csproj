@@ -14,12 +14,15 @@ It offers a unified interface for handling data, ensuring automatic data persist
     <PackageIcon>sk.dt.core.png</PackageIcon>
     <PackageTags>data-management</PackageTags>
     <PackageReleaseNotes>(!) Breaking: DataManager.JsonBank DataManager.EfBank moved to DBankExtensions
-
-(+) Added (beta): DBankExtensions static class with some methods for easier I/O integration shortcuts
-(-) Removed: DBankExtensions.UseSplitJsonIO DBankExtensions.UseJsonIO beta shortcuts
-
+(+) Added: DBankExtensions static class with some methods for easier I/O integration shortcuts
 (~) Updated: DataManager.DataFolderPath moved to IDataManager interface
 (~) Updated: DataManager default data folder is set to 'Resources/Data'
+
+(~) Fixed: DataBank.InitializeAsync() empty data list bug
+
+IdGenerators:
+(~) Updated: GenerateIdFor&lt;TData&gt;(...) requires TData object
+(+) Added: PropertyBasedIdGenerator class
 
 (~) Added: IDataBank.Manager in refer to IDataManager
 (~) Added: UpdateReader/Writer() methods to IDataBank interface
@@ -30,7 +33,7 @@ It offers a unified interface for handling data, ensuring automatic data persist
 (~) Updated XML-Docs</PackageReleaseNotes>
     <AssemblyVersion>1.2.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>$(AssemblyVersion)-preview.1</Version>
+    <Version>$(AssemblyVersion)</Version>
     <IncludeSymbols>False</IncludeSymbols>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>

@@ -21,7 +21,7 @@ namespace SKitLs.Data.Core.IdGenerator
         public Guid GenerateId() => Guid.NewGuid();
 
         /// <inheritdoc/>
-        public Guid GenerateIdFor<TData>(IDataBank<Guid, TData> bank) where TData : ModelDso<Guid>
+        public Guid GenerateIdFor<TData>(IDataBank<Guid, TData> bank, TData @object) where TData : ModelDso<Guid>
         {
             Guid id;
             do
