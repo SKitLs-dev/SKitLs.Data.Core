@@ -13,25 +13,8 @@ It offers a unified interface for handling data, ensuring automatic data persist
     <PackageProjectUrl>https://github.com/SKitLs-dev/SKitLs.Data.Core</PackageProjectUrl>
     <PackageIcon>sk.dt.core.png</PackageIcon>
     <PackageTags>data-management</PackageTags>
-    <PackageReleaseNotes>(!) Breaking: DataManager.JsonBank DataManager.EfBank moved to DBankExtensions
-(+) Added: DBankExtensions static class with some methods for easier I/O integration shortcuts
-(~) Updated: DataManager.DataFolderPath moved to IDataManager interface
-(~) Updated: DataManager default data folder is set to 'Resources/Data'
-
-(~) Fixed: DataBank.InitializeAsync() empty data list bug
-
-IdGenerators:
-(~) Updated: GenerateIdFor&lt;TData&gt;(...) requires TData object
-(+) Added: PropertyBasedIdGenerator class
-
-(~) Added: IDataBank.Manager in refer to IDataManager
-(~) Added: UpdateReader/Writer() methods to IDataBank interface
-(~) Updated: DataBanks interfaces cts is set to null by default
-(~) Updated: DataBanks default file name is set to holding type name by default
-
-(~) Minor internal updates
-(~) Updated XML-Docs</PackageReleaseNotes>
-    <AssemblyVersion>1.2.0</AssemblyVersion>
+    <PackageReleaseNotes>(~) Updated Reference: SKitLs.Data.IO 2.2.1</PackageReleaseNotes>
+    <AssemblyVersion>1.2.1</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Version>$(AssemblyVersion)</Version>
     <IncludeSymbols>False</IncludeSymbols>
@@ -39,6 +22,7 @@ IdGenerators:
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackAsTool>False</PackAsTool>
   </PropertyGroup>
 
   <ItemGroup>
@@ -49,7 +33,7 @@ IdGenerators:
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SKitLs.Data.IO" Version="2.2.0" />
+    <PackageReference Include="SKitLs.Data.IO" Version="2.2.1" />
     <PackageReference Include="SKitLs.Utils.Extensions" Version="0.2.0" />
   </ItemGroup>
 
